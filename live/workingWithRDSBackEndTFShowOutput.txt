@@ -1,0 +1,970 @@
+# module.backend.data.template_file.user_data:
+data "template_file" "user_data" {
+    id       = "5ca2b4e1508e5490ce0ccb948cc5c5726e326d25b6a17bfe76726af8e85d3b99"
+    rendered = <<-EOT
+        #!/bin/bash
+        export DB_PASSWORD="TEst$13ls"
+        sudo yum update -y
+        sudo yum install docker -y
+        sudo service docker start
+        sudo docker pull sanjeevas/backend-node-app:2.0
+        sudo docker run -e DB_HOST=woo-commerce-database.cz6w4680eal7.us-east-2.rds.amazonaws.com:3306 -e DB_USER=admin -e DB_PASSWORD=TEst$13ls -e DB_NAME=primer  /home/ec2-user/env-list -d -p 80:3000 sanjeevas/backend-node-app:9.0
+    EOT
+    template = <<-EOT
+        #!/bin/bash
+        export DB_PASSWORD="TEst$13ls"
+        sudo yum update -y
+        sudo yum install docker -y
+        sudo service docker start
+        sudo docker pull sanjeevas/backend-node-app:2.0
+        sudo docker run -e DB_HOST=woo-commerce-database.cz6w4680eal7.us-east-2.rds.amazonaws.com:3306 -e DB_USER=admin -e DB_PASSWORD=TEst$13ls -e DB_NAME=primer  /home/ec2-user/env-list -d -p 80:3000 sanjeevas/backend-node-app:9.0
+    EOT
+}
+
+# module.backend.aws_launch_template.main:
+resource "aws_launch_template" "main" {
+    arn                     = "arn:aws:ec2:us-east-2:339712726118:launch-template/lt-0e5ce9ae1371a8b79"
+    default_version         = 1
+    disable_api_stop        = false
+    disable_api_termination = false
+    id                      = "lt-0e5ce9ae1371a8b79"
+    image_id                = "ami-02ca28e7c7b8f8be1"
+    instance_type           = "t2.micro"
+    latest_version          = 1
+    name                    = "app-launch-template20240301153719689700000004"
+    name_prefix             = "app-launch-template"
+    tags                    = {
+        "Environment" = "dev"
+        "Name"        = "woo-commerce-terraform-aws-backend"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                = {
+        "Environment" = "dev"
+        "Name"        = "woo-commerce-terraform-aws-backend"
+        "Project"     = "woo-commerce-project"
+    }
+    user_data               = "IyEvYmluL2Jhc2gNCmV4cG9ydCBEQl9QQVNTV09SRD0iVEVzdCQxM2xzIg0Kc3VkbyB5dW0gdXBkYXRlIC15DQpzdWRvIHl1bSBpbnN0YWxsIGRvY2tlciAteQ0Kc3VkbyBzZXJ2aWNlIGRvY2tlciBzdGFydA0Kc3VkbyBkb2NrZXIgcHVsbCBzYW5qZWV2YXMvYmFja2VuZC1ub2RlLWFwcDoyLjANCnN1ZG8gZG9ja2VyIHJ1biAtZSBEQl9IT1NUPXdvby1jb21tZXJjZS1kYXRhYmFzZS5jejZ3NDY4MGVhbDcudXMtZWFzdC0yLnJkcy5hbWF6b25hd3MuY29tOjMzMDYgLWUgREJfVVNFUj1hZG1pbiAtZSBEQl9QQVNTV09SRD1URXN0JDEzbHMgLWUgREJfTkFNRT1wcmltZXIgIC9ob21lL2VjMi11c2VyL2Vudi1saXN0IC1kIC1wIDgwOjMwMDAgc2FuamVldmFzL2JhY2tlbmQtbm9kZS1hcHA6OS4wIA0K"
+    vpc_security_group_ids  = [
+        "sg-075fdeff1e6c121e8",
+    ]
+}
+# module.db.aws_db_instance.woo_commerce_db:
+resource "aws_db_instance" "woo_commerce_db" {
+    address                               = "woo-commerce-database.cz6w4680eal7.us-east-2.rds.amazonaws.com"
+    allocated_storage                     = 20
+    apply_immediately                     = false
+    arn                                   = "arn:aws:rds:us-east-2:339712726118:db:woo-commerce-database"
+    auto_minor_version_upgrade            = true
+    availability_zone                     = "us-east-2a"
+    backup_retention_period               = 7
+    backup_target                         = "region"
+    backup_window                         = "05:21-05:51"
+    ca_cert_identifier                    = "rds-ca-rsa2048-g1"
+    copy_tags_to_snapshot                 = false
+    customer_owned_ip_enabled             = false
+    db_subnet_group_name                  = "db-subnet-group"
+    delete_automated_backups              = true
+    deletion_protection                   = false
+    endpoint                              = "woo-commerce-database.cz6w4680eal7.us-east-2.rds.amazonaws.com:3306"
+    engine                                = "mysql"
+    engine_version                        = "8.0.35"
+    engine_version_actual                 = "8.0.35"
+    hosted_zone_id                        = "Z2XHWR1WZ565X2"
+    iam_database_authentication_enabled   = false
+    id                                    = "db-MB7XCB75GXB6NKOFQIB2JPOHGQ"
+    identifier                            = "woo-commerce-database"
+    instance_class                        = "db.t2.micro"
+    iops                                  = 0
+    latest_restorable_time                = "2024-03-01T15:35:26Z"
+    license_model                         = "general-public-license"
+    listener_endpoint                     = []
+    maintenance_window                    = "tue:10:30-tue:11:00"
+    master_user_secret                    = []
+    max_allocated_storage                 = 0
+    monitoring_interval                   = 0
+    multi_az                              = false
+    network_type                          = "IPV4"
+    option_group_name                     = "default:mysql-8-0"
+    parameter_group_name                  = "default.mysql8.0"
+    password                              = (sensitive value)
+    performance_insights_enabled          = false
+    performance_insights_retention_period = 0
+    port                                  = 3306
+    publicly_accessible                   = false
+    replicas                              = []
+    resource_id                           = "db-MB7XCB75GXB6NKOFQIB2JPOHGQ"
+    skip_final_snapshot                   = true
+    status                                = "available"
+    storage_encrypted                     = false
+    storage_throughput                    = 0
+    storage_type                          = "gp2"
+    tags                                  = {
+        "Environment" = "dev"
+        "Name"        = "woo-commerce-terraform-aws-db"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                              = {
+        "Environment" = "dev"
+        "Name"        = "woo-commerce-terraform-aws-db"
+        "Project"     = "woo-commerce-project"
+    }
+    username                              = "admin"
+    vpc_security_group_ids                = [
+        "sg-0d946e0b9a33967de",
+    ]
+}
+# module.vpc.aws_autoscaling_group.main:
+resource "aws_autoscaling_group" "main" {
+    arn                              = "arn:aws:autoscaling:us-east-2:339712726118:autoScalingGroup:c77b05a1-7142-4e94-bdc4-4742c61f9548:autoScalingGroupName/app-autoscaling-group"
+    availability_zones               = [
+        "us-east-2a",
+        "us-east-2b",
+        "us-east-2c",
+    ]
+    capacity_rebalance               = false
+    default_cooldown                 = 300
+    default_instance_warmup          = 0
+    desired_capacity                 = 1
+    force_delete                     = false
+    force_delete_warm_pool           = false
+    health_check_grace_period        = 300
+    health_check_type                = "EC2"
+    id                               = "app-autoscaling-group"
+    ignore_failed_scaling_activities = false
+    load_balancers                   = []
+    max_instance_lifetime            = 0
+    max_size                         = 1
+    metrics_granularity              = "1Minute"
+    min_size                         = 1
+    name                             = "app-autoscaling-group"
+    predicted_capacity               = 0
+    protect_from_scale_in            = false
+    service_linked_role_arn          = "arn:aws:iam::339712726118:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+    target_group_arns                = [
+        "arn:aws:elasticloadbalancing:us-east-2:339712726118:targetgroup/alb-target-group/23f4a61d5ab222bb",
+    ]
+    vpc_zone_identifier              = [
+        "subnet-05e1859f27183d6d2",
+        "subnet-0c81ca7057a9dfb87",
+        "subnet-0ccc2f9a35639089b",
+    ]
+    wait_for_capacity_timeout        = "10m"
+    warm_pool_size                   = 0
+
+    launch_template {
+        id      = "lt-0e5ce9ae1371a8b79"
+        name    = "app-launch-template20240301153719689700000004"
+        version = "$Latest"
+    }
+
+    traffic_source {
+        identifier = "arn:aws:elasticloadbalancing:us-east-2:339712726118:targetgroup/alb-target-group/23f4a61d5ab222bb"
+        type       = "elbv2"
+    }
+}
+
+# module.vpc.aws_db_subnet_group.main:
+resource "aws_db_subnet_group" "main" {
+    arn                     = "arn:aws:rds:us-east-2:339712726118:subgrp:db-subnet-group"
+    description             = "Managed by Terraform"
+    id                      = "db-subnet-group"
+    name                    = "db-subnet-group"
+    subnet_ids              = [
+        "subnet-033e2862950d8c7b8",
+        "subnet-0b67f6f4155aaba2b",
+        "subnet-0c7608353b02d54cb",
+    ]
+    supported_network_types = [
+        "IPV4",
+    ]
+    tags                    = {
+        "Environment" = "dev"
+        "Name"        = "database-subnet-group"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                = {
+        "Environment" = "dev"
+        "Name"        = "database-subnet-group"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                  = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_internet_gateway.main:
+resource "aws_internet_gateway" "main" {
+    arn      = "arn:aws:ec2:us-east-2:339712726118:internet-gateway/igw-0f578eef0658b68f3"
+    id       = "igw-0f578eef0658b68f3"
+    owner_id = "339712726118"
+    tags     = {
+        "Environment" = "dev"
+        "Name"        = "internet-gateway"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all = {
+        "Environment" = "dev"
+        "Name"        = "internet-gateway"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id   = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_lb.main:
+resource "aws_lb" "main" {
+    arn                                         = "arn:aws:elasticloadbalancing:us-east-2:339712726118:loadbalancer/app/app-alb/77167a536dca31e9"
+    arn_suffix                                  = "app/app-alb/77167a536dca31e9"
+    desync_mitigation_mode                      = "defensive"
+    dns_name                                    = "app-alb-215805149.us-east-2.elb.amazonaws.com"
+    drop_invalid_header_fields                  = false
+    enable_cross_zone_load_balancing            = true
+    enable_deletion_protection                  = false
+    enable_http2                                = true
+    enable_tls_version_and_cipher_suite_headers = false
+    enable_waf_fail_open                        = false
+    enable_xff_client_port                      = false
+    id                                          = "arn:aws:elasticloadbalancing:us-east-2:339712726118:loadbalancer/app/app-alb/77167a536dca31e9"
+    idle_timeout                                = 60
+    internal                                    = false
+    ip_address_type                             = "ipv4"
+    load_balancer_type                          = "application"
+    name                                        = "app-alb"
+    preserve_host_header                        = false
+    security_groups                             = [
+        "sg-0a974a9bd1a8d707d",
+    ]
+    subnets                                     = [
+        "subnet-05e1859f27183d6d2",
+        "subnet-0c81ca7057a9dfb87",
+        "subnet-0ccc2f9a35639089b",
+    ]
+    tags                                        = {
+        "Environment" = "dev"
+        "Name"        = "application-alb"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                    = {
+        "Environment" = "dev"
+        "Name"        = "application-alb"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                      = "vpc-0c8fd6ff7288d9f29"
+    xff_header_processing_mode                  = "append"
+    zone_id                                     = "Z3AADJGX6KTTL2"
+
+    access_logs {
+        enabled = false
+    }
+
+    connection_logs {
+        enabled = false
+    }
+
+    subnet_mapping {
+        subnet_id = "subnet-05e1859f27183d6d2"
+    }
+    subnet_mapping {
+        subnet_id = "subnet-0c81ca7057a9dfb87"
+    }
+    subnet_mapping {
+        subnet_id = "subnet-0ccc2f9a35639089b"
+    }
+}
+
+# module.vpc.aws_lb_listener.main:
+resource "aws_lb_listener" "main" {
+    arn               = "arn:aws:elasticloadbalancing:us-east-2:339712726118:listener/app/app-alb/77167a536dca31e9/f064b08e9cedf79b"
+    id                = "arn:aws:elasticloadbalancing:us-east-2:339712726118:listener/app/app-alb/77167a536dca31e9/f064b08e9cedf79b"
+    load_balancer_arn = "arn:aws:elasticloadbalancing:us-east-2:339712726118:loadbalancer/app/app-alb/77167a536dca31e9"
+    port              = 80
+    protocol          = "HTTP"
+    tags_all          = {}
+
+    default_action {
+        order            = 1
+        target_group_arn = "arn:aws:elasticloadbalancing:us-east-2:339712726118:targetgroup/alb-target-group/23f4a61d5ab222bb"
+        type             = "forward"
+    }
+}
+
+# module.vpc.aws_lb_target_group.main:
+resource "aws_lb_target_group" "main" {
+    arn                                = "arn:aws:elasticloadbalancing:us-east-2:339712726118:targetgroup/alb-target-group/23f4a61d5ab222bb"
+    arn_suffix                         = "targetgroup/alb-target-group/23f4a61d5ab222bb"
+    deregistration_delay               = "300"
+    id                                 = "arn:aws:elasticloadbalancing:us-east-2:339712726118:targetgroup/alb-target-group/23f4a61d5ab222bb"
+    ip_address_type                    = "ipv4"
+    lambda_multi_value_headers_enabled = false
+    load_balancer_arns                 = []
+    load_balancing_algorithm_type      = "round_robin"
+    load_balancing_anomaly_mitigation  = "off"
+    load_balancing_cross_zone_enabled  = "use_load_balancer_configuration"
+    name                               = "alb-target-group"
+    port                               = 80
+    protocol                           = "HTTP"
+    protocol_version                   = "HTTP1"
+    proxy_protocol_v2                  = false
+    slow_start                         = 0
+    tags_all                           = {}
+    target_type                        = "instance"
+    vpc_id                             = "vpc-0c8fd6ff7288d9f29"
+
+    health_check {
+        enabled             = true
+        healthy_threshold   = 3
+        interval            = 30
+        matcher             = "200"
+        path                = "/"
+        port                = "80"
+        protocol            = "HTTP"
+        timeout             = 5
+        unhealthy_threshold = 3
+    }
+
+    stickiness {
+        cookie_duration = 86400
+        enabled         = false
+        type            = "lb_cookie"
+    }
+
+    target_failover {}
+
+    target_health_state {}
+}
+
+# module.vpc.aws_route_table.main["us-east-2a"]:
+resource "aws_route_table" "main" {
+    arn              = "arn:aws:ec2:us-east-2:339712726118:route-table/rtb-04cd7f6f3dc562f2f"
+    id               = "rtb-04cd7f6f3dc562f2f"
+    owner_id         = "339712726118"
+    propagating_vgws = []
+    route            = [
+        {
+            carrier_gateway_id         = ""
+            cidr_block                 = "0.0.0.0/0"
+            core_network_arn           = ""
+            destination_prefix_list_id = ""
+            egress_only_gateway_id     = ""
+            gateway_id                 = "igw-0f578eef0658b68f3"
+            ipv6_cidr_block            = ""
+            local_gateway_id           = ""
+            nat_gateway_id             = ""
+            network_interface_id       = ""
+            transit_gateway_id         = ""
+            vpc_endpoint_id            = ""
+            vpc_peering_connection_id  = ""
+        },
+    ]
+    tags             = {
+        "Environment" = "dev"
+        "Name"        = "public-route-table"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all         = {
+        "Environment" = "dev"
+        "Name"        = "public-route-table"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id           = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_route_table.main["us-east-2b"]:
+resource "aws_route_table" "main" {
+    arn              = "arn:aws:ec2:us-east-2:339712726118:route-table/rtb-00b94b8d207e6c4e5"
+    id               = "rtb-00b94b8d207e6c4e5"
+    owner_id         = "339712726118"
+    propagating_vgws = []
+    route            = [
+        {
+            carrier_gateway_id         = ""
+            cidr_block                 = "0.0.0.0/0"
+            core_network_arn           = ""
+            destination_prefix_list_id = ""
+            egress_only_gateway_id     = ""
+            gateway_id                 = "igw-0f578eef0658b68f3"
+            ipv6_cidr_block            = ""
+            local_gateway_id           = ""
+            nat_gateway_id             = ""
+            network_interface_id       = ""
+            transit_gateway_id         = ""
+            vpc_endpoint_id            = ""
+            vpc_peering_connection_id  = ""
+        },
+    ]
+    tags             = {
+        "Environment" = "dev"
+        "Name"        = "public-route-table"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all         = {
+        "Environment" = "dev"
+        "Name"        = "public-route-table"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id           = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_route_table.main["us-east-2c"]:
+resource "aws_route_table" "main" {
+    arn              = "arn:aws:ec2:us-east-2:339712726118:route-table/rtb-01391d81051f77f66"
+    id               = "rtb-01391d81051f77f66"
+    owner_id         = "339712726118"
+    propagating_vgws = []
+    route            = [
+        {
+            carrier_gateway_id         = ""
+            cidr_block                 = "0.0.0.0/0"
+            core_network_arn           = ""
+            destination_prefix_list_id = ""
+            egress_only_gateway_id     = ""
+            gateway_id                 = "igw-0f578eef0658b68f3"
+            ipv6_cidr_block            = ""
+            local_gateway_id           = ""
+            nat_gateway_id             = ""
+            network_interface_id       = ""
+            transit_gateway_id         = ""
+            vpc_endpoint_id            = ""
+            vpc_peering_connection_id  = ""
+        },
+    ]
+    tags             = {
+        "Environment" = "dev"
+        "Name"        = "public-route-table"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all         = {
+        "Environment" = "dev"
+        "Name"        = "public-route-table"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id           = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_route_table_association.main["us-east-2a"]:
+resource "aws_route_table_association" "main" {
+    id             = "rtbassoc-069aaa0467c772024"
+    route_table_id = "rtb-04cd7f6f3dc562f2f"
+    subnet_id      = "subnet-05e1859f27183d6d2"
+}
+
+# module.vpc.aws_route_table_association.main["us-east-2b"]:
+resource "aws_route_table_association" "main" {
+    id             = "rtbassoc-0cf34ff10ed9cba83"
+    route_table_id = "rtb-00b94b8d207e6c4e5"
+    subnet_id      = "subnet-0ccc2f9a35639089b"
+}
+
+# module.vpc.aws_route_table_association.main["us-east-2c"]:
+resource "aws_route_table_association" "main" {
+    id             = "rtbassoc-03a3ca042a97a53bd"
+    route_table_id = "rtb-01391d81051f77f66"
+    subnet_id      = "subnet-0c81ca7057a9dfb87"
+}
+
+# module.vpc.aws_security_group.alb_security_group:
+resource "aws_security_group" "alb_security_group" {
+    arn                    = "arn:aws:ec2:us-east-2:339712726118:security-group/sg-0a974a9bd1a8d707d"
+    description            = "Security Group for Application Load Balancer"
+    egress                 = [
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow all Egress traffic"
+            from_port        = 0
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "-1"
+            security_groups  = []
+            self             = false
+            to_port          = 0
+        },
+    ]
+    id                     = "sg-0a974a9bd1a8d707d"
+    ingress                = [
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow HTTP access"
+            from_port        = 80
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = []
+            self             = false
+            to_port          = 80
+        },
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow HTTPS access"
+            from_port        = 443
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = []
+            self             = false
+            to_port          = 443
+        },
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow SSH access"
+            from_port        = 22
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = []
+            self             = false
+            to_port          = 22
+        },
+    ]
+    name                   = "alb-app-security-group"
+    owner_id               = "339712726118"
+    revoke_rules_on_delete = false
+    tags                   = {
+        "Environment" = "dev"
+        "Name"        = "alb-security-group"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all               = {
+        "Environment" = "dev"
+        "Name"        = "alb-security-group"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                 = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_security_group.app_security_group:
+resource "aws_security_group" "app_security_group" {
+    arn                    = "arn:aws:ec2:us-east-2:339712726118:security-group/sg-075fdeff1e6c121e8"
+    description            = "Security Group for backend Host"
+    egress                 = [
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow all Egress traffic"
+            from_port        = 0
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "-1"
+            security_groups  = []
+            self             = false
+            to_port          = 0
+        },
+    ]
+    id                     = "sg-075fdeff1e6c121e8"
+    ingress                = [
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow HTTP access"
+            from_port        = 80
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = [
+                "sg-0a974a9bd1a8d707d",
+            ]
+            self             = false
+            to_port          = 80
+        },
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow HTTPS access"
+            from_port        = 443
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = [
+                "sg-0a974a9bd1a8d707d",
+            ]
+            self             = false
+            to_port          = 443
+        },
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow SSH access"
+            from_port        = 22
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = [
+                "sg-0a974a9bd1a8d707d",
+            ]
+            self             = false
+            to_port          = 22
+        },
+    ]
+    name                   = "app-instance-security-group"
+    owner_id               = "339712726118"
+    revoke_rules_on_delete = false
+    tags                   = {
+        "Environment" = "dev"
+        "Name"        = "ec2-security-group"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all               = {
+        "Environment" = "dev"
+        "Name"        = "ec2-security-group"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                 = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_security_group.db_security_group:
+resource "aws_security_group" "db_security_group" {
+    arn                    = "arn:aws:ec2:us-east-2:339712726118:security-group/sg-0d946e0b9a33967de"
+    description            = "Security Group for RDS MySQL Database"
+    egress                 = [
+        {
+            cidr_blocks      = [
+                "0.0.0.0/0",
+            ]
+            description      = "Allow all Egress traffic"
+            from_port        = 0
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "-1"
+            security_groups  = []
+            self             = false
+            to_port          = 0
+        },
+    ]
+    id                     = "sg-0d946e0b9a33967de"
+    ingress                = [
+        {
+            cidr_blocks      = []
+            description      = "Allow MySQL access"
+            from_port        = 3306
+            ipv6_cidr_blocks = []
+            prefix_list_ids  = []
+            protocol         = "tcp"
+            security_groups  = [
+                "sg-075fdeff1e6c121e8",
+            ]
+            self             = false
+            to_port          = 3306
+        },
+    ]
+    name                   = "db-security-group"
+    owner_id               = "339712726118"
+    revoke_rules_on_delete = false
+    tags                   = {
+        "Environment" = "dev"
+        "Name"        = "rds-security-group"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all               = {
+        "Environment" = "dev"
+        "Name"        = "rds-security-group"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                 = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.database_subnet["us-east-2a"]:
+resource "aws_subnet" "database_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-0b67f6f4155aaba2b"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2a"
+    availability_zone_id                           = "use2-az1"
+    cidr_block                                     = "10.0.201.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0b67f6f4155aaba2b"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "database-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "database-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.database_subnet["us-east-2b"]:
+resource "aws_subnet" "database_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-0c7608353b02d54cb"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2b"
+    availability_zone_id                           = "use2-az2"
+    cidr_block                                     = "10.0.202.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0c7608353b02d54cb"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "database-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "database-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.database_subnet["us-east-2c"]:
+resource "aws_subnet" "database_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-033e2862950d8c7b8"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2c"
+    availability_zone_id                           = "use2-az3"
+    cidr_block                                     = "10.0.203.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-033e2862950d8c7b8"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "database-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "database-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.private_subnet["us-east-2a"]:
+resource "aws_subnet" "private_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-017088cc3aeea9567"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2a"
+    availability_zone_id                           = "use2-az1"
+    cidr_block                                     = "10.0.101.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-017088cc3aeea9567"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "private-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "private-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.private_subnet["us-east-2b"]:
+resource "aws_subnet" "private_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-075a68d6c7e7c4f11"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2b"
+    availability_zone_id                           = "use2-az2"
+    cidr_block                                     = "10.0.102.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-075a68d6c7e7c4f11"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "private-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "private-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.private_subnet["us-east-2c"]:
+resource "aws_subnet" "private_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-01ce0967f0c9c1a45"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2c"
+    availability_zone_id                           = "use2-az3"
+    cidr_block                                     = "10.0.103.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-01ce0967f0c9c1a45"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = false
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "private-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "private-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.public_subnet["us-east-2a"]:
+resource "aws_subnet" "public_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-05e1859f27183d6d2"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2a"
+    availability_zone_id                           = "use2-az1"
+    cidr_block                                     = "10.0.0.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-05e1859f27183d6d2"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = true
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "public-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "public-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.public_subnet["us-east-2b"]:
+resource "aws_subnet" "public_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-0ccc2f9a35639089b"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2b"
+    availability_zone_id                           = "use2-az2"
+    cidr_block                                     = "10.0.1.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0ccc2f9a35639089b"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = true
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "public-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "public-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_subnet.public_subnet["us-east-2c"]:
+resource "aws_subnet" "public_subnet" {
+    arn                                            = "arn:aws:ec2:us-east-2:339712726118:subnet/subnet-0c81ca7057a9dfb87"
+    assign_ipv6_address_on_creation                = false
+    availability_zone                              = "us-east-2c"
+    availability_zone_id                           = "use2-az3"
+    cidr_block                                     = "10.0.2.0/24"
+    enable_dns64                                   = false
+    enable_lni_at_device_index                     = 0
+    enable_resource_name_dns_a_record_on_launch    = false
+    enable_resource_name_dns_aaaa_record_on_launch = false
+    id                                             = "subnet-0c81ca7057a9dfb87"
+    ipv6_native                                    = false
+    map_customer_owned_ip_on_launch                = false
+    map_public_ip_on_launch                        = true
+    owner_id                                       = "339712726118"
+    private_dns_hostname_type_on_launch            = "ip-name"
+    tags                                           = {
+        "Environment" = "dev"
+        "Name"        = "public-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                                       = {
+        "Environment" = "dev"
+        "Name"        = "public-subnet"
+        "Project"     = "woo-commerce-project"
+    }
+    vpc_id                                         = "vpc-0c8fd6ff7288d9f29"
+}
+
+# module.vpc.aws_vpc.main:
+resource "aws_vpc" "main" {
+    arn                                  = "arn:aws:ec2:us-east-2:339712726118:vpc/vpc-0c8fd6ff7288d9f29"
+    assign_generated_ipv6_cidr_block     = false
+    cidr_block                           = "10.0.0.0/16"
+    default_network_acl_id               = "acl-046bab3d39466846e"
+    default_route_table_id               = "rtb-030dfaee65f531e8f"
+    default_security_group_id            = "sg-014fd7b69eb6e34fe"
+    dhcp_options_id                      = "dopt-090bf1cebbffa7137"
+    enable_dns_hostnames                 = false
+    enable_dns_support                   = true
+    enable_network_address_usage_metrics = false
+    id                                   = "vpc-0c8fd6ff7288d9f29"
+    instance_tenancy                     = "default"
+    ipv6_netmask_length                  = 0
+    main_route_table_id                  = "rtb-030dfaee65f531e8f"
+    owner_id                             = "339712726118"
+    tags                                 = {
+        "Environment" = "dev"
+        "Name"        = "VPC"
+        "Project"     = "woo-commerce-project"
+    }
+    tags_all                             = {
+        "Environment" = "dev"
+        "Name"        = "VPC"
+        "Project"     = "woo-commerce-project"
+    }
+}
