@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('mysql');
+// require('dotenv').config();
 
 const app = express();
 const port = 3000;
@@ -52,14 +53,30 @@ connection.connect((err) => {
 
         console.log('Database and table initialization complete');
 
-        // Insert some rows into the 'products' table
-        connection.query(`INSERT INTO ${tableName} (name, price) VALUES ?`, [productsData.map(product => [product.name, product.price])], (insertErr, results)  => {
-          if (insertErr) {
-            console.error('Error inserting row:', insertErr);
-          }
+        // Check if the products table is empty
+  connection.query(`SELECT COUNT(*) AS count FROM ${tableName}`, (error, results, fields) => {
+    if (error) {
+      console.error('Error checking for existing rows: ' + error.stack);
+      connection.end();
+      return;
+    }
+    const rowCount = results[0].count;
 
-          console.log('Inserted a row into the products table');
-        });
+    if (rowCount === 0) {
+      // Insert rows into the products table
+        connection.query(`INSERT INTO ${tableName} (name, price) VALUES ?`, [productsData.map(product => [product.name, product.price])], (err, res) => {
+          if (err) {
+            console.error('Error inserting rows: ' + err.stack);
+          } else {
+          console.log('Inserted ' + res.affectedRows + ' row(s) into products table');
+        }
+      });
+    } else {
+      console.log('Products table is not empty. No action taken.');
+    }
+  });
+
+
       });
     });
   });

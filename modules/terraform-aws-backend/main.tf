@@ -1,3 +1,4 @@
+# Ideally, should be getting the password from Kubernetes secret, but since this is a demo, we are passing it as a variable.
 data "template_file" "user_data" {
   template = <<-EOF
     #!/bin/bash
@@ -5,10 +6,16 @@ data "template_file" "user_data" {
     sudo yum update -y
     sudo yum install docker -y
     sudo service docker start
-    sudo docker pull sanjeevas/backend-node-app:10.0
-    sudo docker run -e DB_HOST=${var.database_endpoint} -e DB_USER=${var.db_user} -e DB_PASSWORD=${var.db_password} -e DB_NAME=${var.db_database} -d -p 80:3000 sanjeevas/backend-node-app:10.0 
+    touch /home/ec2-user/env.file
+    echo "DB_HOST=${var.database_address}" >> /home/ec2-user/env.file
+    echo "DB_USER=${var.db_user}" >> /home/ec2-user/env.file
+    echo "DB_NAME=${var.db_database}" >> /home/ec2-user/env.file
+    echo "DB_PASSWORD=${var.db_password}" >> /home/ec2-user/env.file
+    sudo docker pull sanjeevas/backend-node-app:latest
+    sudo docker run --env-file /home/ec2-user/env.file -d -p ${var.app_port}:3000 sanjeevas/backend-node-app:latest
   EOF
 }
+
 
 # Backend application - Launch Template
 resource "aws_launch_template" "main" {
@@ -22,3 +29,4 @@ resource "aws_launch_template" "main" {
 
   tags = var.tags
 }
+

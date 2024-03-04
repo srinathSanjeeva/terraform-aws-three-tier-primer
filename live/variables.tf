@@ -156,6 +156,12 @@ variable "app_autoscaling_group" {
   default = "app-autoscaling-group"
 }
 
+variable "frontend_app_autoscaling_group" {
+  description = "The name of the Application Autoscaling Group"
+  type = string
+  default = "frontend-app-autoscaling-group"
+}
+
 variable "desired_capacity" {
   description = "The desired capacity of the Autoscaling Group"
   type = string
@@ -184,6 +190,12 @@ variable "alb_security_group_name" {
   description = "The name of the Application Load Balancer Security Group"
   type = string
   default = "alb-app-security-group"
+}
+
+variable "front_end_app_security_group_name" {
+  description = "The name of the Application Security Group"
+  type = string
+  default = "frontend-instance-security-group"
 }
 
 variable "app_security_group_name" {
@@ -238,8 +250,24 @@ variable "name_prefix" {
   default     = "app-launch-template"
 }
 
+variable "frontend_name_prefix" {
+  description = "Name of frontend Launch Template"
+  type        = string
+  default     = "frontend-app-launch-template"
+}
+
 variable "id_app" {
   description = "Launch Template ID"
   type        = string
   default     = "aws_launch_template.main.id"
+}
+
+variable "extra_tags" {
+  default = [
+    {
+      key                 = "backend-instance"
+      value               = "woo-commerce-terraform-aws-backend"
+      propagate_at_launch = true
+    }
+  ]
 }

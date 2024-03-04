@@ -14,12 +14,29 @@ variable "instance_type" {
   type = string
 }
 
-variable "app_security_group" {
-  description = "Application Security Group"
-  type = string
-}
-
 variable "name_prefix" {
   description = "Name of Launch Template"
   type    = string
+}
+
+variable "front_end_app_security_group" {
+  description = "Front End Application Security Group"
+  type = string
+  
+}
+
+variable "backend_app_endpoint" {
+  description = "Backend Application Endpoint"
+  type = string
+}
+
+variable "backend_app_port" {
+  description = "Backend Application Port"
+  type = string  
+}
+
+variable "backend_uri" {
+  description = "Backend URI"
+  type = string  
+  
 }

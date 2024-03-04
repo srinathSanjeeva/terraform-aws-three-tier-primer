@@ -24,9 +24,6 @@ variable "name_prefix" {
   type    = string
 }
 
-variable "database_endpoint" {
-  type = string  
-}
 
 variable "db_user" {
   type = string
@@ -42,4 +39,28 @@ variable "db_database" {
   type = string
   description = "Database name"
   default = "primer"
+}
+
+variable "database_address" {
+  type = string
+  description = "Database address"
+  
+}
+
+variable "app_port" {
+  type = string
+  description = "Backend Application port"
+  default = "3000"
+}
+
+variable "backend_uri" {
+  description = "Backend URI"
+  type = string
+  default = "api/products"  
+  
+}
+
+variable "backend_subnet_ids"{ 
+  description = "Backend Subnet IDs"
+  type = map(string)
 }

@@ -8,9 +8,22 @@ locals {
       port        = 443
       description = "Allow HTTPS access"
     },
+    # {
+    #   port        = 3000
+    #   description = "Allow Backend Script access"
+    #   },
     {
       port        = 22
       description = "Allow SSH access"
+  }]
+
+  backend_app_ingress_rules = [{
+    port            = 3000
+    description     = "Allow Backend Node JS Script access"
+  },
+  {
+    port        = 22
+    description = "Allow SSH access"
   }]
 
   rds_ingress_rules = [{
@@ -78,7 +91,7 @@ resource "aws_route_table" "main" {
 
   route {
     cidr_block             = var.cidr_block
-    gateway_id             = var.gateway_id 
+    gateway_id             = var.gateway_id
   }
 
   tags = merge(var.tags, { Name = "public-route-table" })
@@ -97,7 +110,7 @@ resource "aws_lb" "main" {
   internal           = var.alb_internal
   load_balancer_type = var.load_balancer_type
   security_groups    = [var.alb_security_group]
-  subnets            = [for value in aws_subnet.public_subnet : value.id] 
+  subnets            = [for value in aws_subnet.public_subnet : value.id]
 
   tags = merge(var.tags, { Name = "application-alb" })
 }
@@ -139,6 +152,41 @@ resource "aws_autoscaling_group" "main" {
 
   launch_template {
     id      = var.id_app
+    version = "$Latest"
+  }
+
+  # tag = var.tags
+
+  dynamic "tag" {
+    for_each = var.extra_tags
+    content {
+      key                 = tag.value.key
+      propagate_at_launch = tag.value.propagate_at_launch
+      value               = tag.value.value
+    }
+  }  
+}
+
+data "aws_instances" "main" {
+  filter{
+    # Create a filter based on subnet id
+    name   = "subnet-id"
+    values = [for value in aws_subnet.private_subnet : value.id]
+  }
+  # instance_ids = aws_autoscaling_group.main.ec2_instance_ids 
+}
+
+resource "aws_autoscaling_group" "frontend" {
+  name                = var.frontend_app_autoscaling_group
+  desired_capacity    = var.desired_capacity
+  max_size            = var.max_size
+  min_size            = var.min_size
+  target_group_arns   = [aws_lb_target_group.main.arn]
+
+  vpc_zone_identifier = [for value in aws_subnet.public_subnet : value.id]
+
+  launch_template {
+    id      = var.frontend_id_app
     version = "$Latest"
   }
 }
@@ -188,13 +236,12 @@ resource "aws_security_group" "alb_security_group" {
   tags = merge(var.tags, { Name = "alb-security-group" })
 }
 
-
 ################################################################################
-# Backend - Security Group 
+# Frontend - Security Group
 ################################################################################
-resource "aws_security_group" "app_security_group" {
-  name        = var.app_security_group_name
-  description = "Security Group for backend Host"
+resource "aws_security_group" "front_end_app_security_group" {
+  name        = var.front_end_app_security_group_name
+  description = "Security Group for frontend Host"
   vpc_id      = var.vpc_id
 
   dynamic "ingress" {
@@ -224,7 +271,46 @@ resource "aws_security_group" "app_security_group" {
     }
   }
 
-  tags = merge(var.tags, { Name = "ec2-security-group" })
+  tags = merge(var.tags, { Name = "frontend-security-group" })
+}
+
+
+################################################################################
+# Applications - Security Group
+################################################################################
+resource "aws_security_group" "app_security_group" {
+  name        = var.app_security_group_name
+  description = "Security Group for backend Host"
+  vpc_id      = var.vpc_id
+
+  dynamic "ingress" {
+    for_each = local.backend_app_ingress_rules
+
+    content {
+      description = ingress.value.description
+      from_port   = ingress.value.port
+      to_port     = ingress.value.port
+      protocol    = "tcp"
+      cidr_blocks = [var.cidr_block]
+      security_groups = [aws_security_group.front_end_app_security_group.id]
+
+    }
+  }
+
+  dynamic "egress" {
+    for_each = local.egress_rules
+
+    content {
+      description = egress.value.description
+      from_port   = egress.value.port
+      to_port     = egress.value.port
+      protocol    = "-1"
+      cidr_blocks = [var.cidr_block]
+
+    }
+  }
+
+  tags = merge(var.tags, { Name = "backend-security-group" })
 }
 
 ################################################################################

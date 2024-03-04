@@ -4,6 +4,7 @@ module "vpc" {
   vpc_cidr                  = var.vpc_cidr
   public_subnet             = var.public_subnet
   private_subnet            = var.private_subnet
+  #backend_subnet            = module.vpc.subnet_ids
   database_subnet           = var.database_subnet
   availability_zones        = var.availability_zones
   cidr_block                = var.cidr_block
@@ -12,6 +13,7 @@ module "vpc" {
   #gateway_id                = var.gateway_id
   subnet_id                 = var.subnet_id
   id_app                    = module.backend.id_app
+  frontend_id_app           = module.frontend.frontend_id_app
   load_balancer_type        = var.load_balancer_type
   app_alb                   = var.app_alb
   alb_internal              = var.alb_internal
@@ -24,6 +26,7 @@ module "vpc" {
   alb_target_group_port     = var.alb_target_group_port
   alb_target_group_protocol = var.alb_target_group_protocol
   app_autoscaling_group     = var.app_autoscaling_group
+  frontend_app_autoscaling_group = var.frontend_app_autoscaling_group
   desired_capacity          = var.desired_capacity
   max_size                  = var.max_size
   min_size                  = var.min_size
@@ -33,7 +36,9 @@ module "vpc" {
   db_security_group_name    = var.db_security_group_name
   alb_security_group        = module.vpc.alb_security_group
   app_security_group        = var.app_security_group
+  front_end_app_security_group_name = var.front_end_app_security_group_name
   tags                = merge(var.tags, { Name = "woo-commerce-terraform-aws-vpc" })
+  extra_tags          = var.extra_tags
 
 }
 
@@ -54,19 +59,34 @@ module "backend" {
   instance_type      = var.instance_type
   app_security_group = module.vpc.app_security_group
   name_prefix        = var.name_prefix
-  database_endpoint = module.db.database_endpoint
+  database_address = module.db.database_address
   db_user = module.db.database_username
-  db_password = var.db_password
-  # subnet_ids = module.vpc.private_subnet_id
+  db_password = module.db.database_password
+  backend_subnet_ids = module.vpc.subnet_ids
   # security_group_id = module.db.database_sg_id
 }
 
-# module "frontend" {
-#   source = "../modules/terraform-aws-frontend"
-#   tags = merge(var.tags, { Name = "woo-commerce-terraform-aws-frontend" })
-#   #lambda_function_name = module.backend.lambda_function_name
-#   # frontend_code_bucket = abspath("../frontend-code")
-#   # lambda_function_code = abspath("../lambda-function-code")
-#   api_invoke_url = module.backend.api_gateway_invoke_url
+module "frontend" {
+  source = "../modules/terraform-aws-frontend"
+  tags = merge(var.tags, { Name = "woo-commerce-terraform-aws-frontend" })
+  image_id           = var.image_id
+  instance_type      = var.instance_type
+  front_end_app_security_group = module.vpc.front_end_app_security_group
+  name_prefix        = var.frontend_name_prefix
+  # backend_app_endpoint = data.aws_instances.main.public_ips[0]
+  backend_app_endpoint = data.aws_instances.main.public_ips[0]
+  backend_app_port = module.backend.backend_app_port
+  backend_uri = module.backend.backend_uri
 
-# }
+  # Add depends_on to ensure the backend is created first
+  depends_on = [module.backend]
+}
+
+data "aws_instances" "main" {
+  instance_tags = {
+    "backend-instance" = "woo-commerce-terraform-aws-backend"
+  }
+  instance_state_names = ["pending", "running"]
+  depends_on = [module.backend]
+}
+

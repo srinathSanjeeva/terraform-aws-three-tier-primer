@@ -21,3 +21,19 @@ resource "aws_db_instance" "woo_commerce_db" {
   tags = var.tags
 }
 
+# Create an SSM parameter with SecureString type
+resource "aws_ssm_parameter" "db_password" {
+  name        = "db_instance_password_ssm" 
+  description = "Database password for application"
+  type        = "SecureString"
+  value       = var.db_password
+  key_id      = aws_kms_key.my_key.id
+}
+
+# Create a KMS key for encrypting the parameter value
+resource "aws_kms_key" "my_key" {
+  description             = "KMS key for encrypting SSM parameter"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+}
+

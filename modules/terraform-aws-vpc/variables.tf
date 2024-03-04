@@ -58,6 +58,11 @@ variable "id_app" {
   type = string
 }
 
+variable "frontend_id_app" {
+  description = "Launch Template ID"
+  type = string
+}
+
 variable "load_balancer_type" {
   description = "The type of Load Balancer"
   type = string
@@ -118,6 +123,11 @@ variable "app_autoscaling_group" {
   type = string
 }
 
+variable "frontend_app_autoscaling_group" {
+  description = "Autoscaling Group Name"
+  type = string
+}
+
 variable "desired_capacity" {
   description = "The number of EC2 instances that should be running in the group"
   type = string
@@ -143,6 +153,11 @@ variable "alb_security_group_name" {
   type = string
 }
 
+variable "front_end_app_security_group_name" {
+  description = "App Instance Security Group Name"
+  type = string
+}
+
 variable "app_security_group_name" {
   description = "App Instance Security Group Name"
   type = string
@@ -163,3 +178,23 @@ variable "app_security_group" {
   type = string
 }
 
+# variable "backend_subnet" {
+#   description = "Private Subnet Group"
+#   type = map(string)
+  
+# }
+
+variable "extra_tags" {
+  default = [
+    {
+      key                 = "backend-instance"
+      value               = "woo-commerce-terraform-aws-backend"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Baz"
+      value               = "Bam"
+      propagate_at_launch = true
+    },
+  ]
+}

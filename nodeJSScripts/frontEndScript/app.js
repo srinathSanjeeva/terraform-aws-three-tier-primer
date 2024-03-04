@@ -4,8 +4,14 @@ const axios = require('axios');
 const app = express();
 const port = 3000;
 
-// API URL configuration using environment variable
-const apiUrl = process.env.API_URL || 'https://jsonplaceholder.typicode.com/todos/1';
+// Access the environment variables from backend
+const host = process.env.HOST;
+const backendPort = process.env.PORT;
+const uri = process.env.URI;
+
+
+// API URL configuration using environment variable, otherwise use a default URL
+const apiUrl = `http://${host}:${port}/${uri}` || 'https://jsonplaceholder.typicode.com/todos/1';
 
 // API endpoint to fetch data and print as HTML response
 app.get('/api/data', async (req, res) => {
